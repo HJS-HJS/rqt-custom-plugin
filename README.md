@@ -1,2 +1,2 @@
 # rqt_custom_plugin
-reporqt custom plugin
+ROS repository for custom rqt plugin.
