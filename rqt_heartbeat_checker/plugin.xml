@@ -10,7 +10,7 @@
         <statustip>Plugins related to ROS topics</statustip>
       </group>
       <label>Heart Beat Checker</label>
-      <icon type="theme">system-help</icon>
+      <icon type="theme">clock</icon>
       <statustip>Great user interface to provide real value.</statustip>
     </qtgui>
   </class>

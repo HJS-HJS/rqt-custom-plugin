@@ -10,6 +10,7 @@ class HeartBeatIndicator(QLabel):
     
     def __init__(self, text, topic):
         super(HeartBeatIndicator, self).__init__(text)
+        self.setObjectName(topic)        
         self.setText(text)
         self.style_red = COLOR["red"]
         self.style_green = COLOR["green"]

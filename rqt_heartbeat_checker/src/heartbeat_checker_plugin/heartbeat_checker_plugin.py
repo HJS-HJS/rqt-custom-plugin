@@ -15,8 +15,9 @@ class HeartBeatPlugin(Plugin):
         context.add_widget(self._widget)
 
     def shutdown_plugin(self):
-        self._widget.shutdown_plugin()
-        self._widget.close()
+        # self._widget.shutdown_plugin()
+        del self._widget
+        print("rqt heartBeat checker plugin closed")
 
     def save_settings(self, plugin_settings, instance_settings):
         pass
