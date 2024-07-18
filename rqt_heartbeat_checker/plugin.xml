@@ -1,0 +1,17 @@
+<library path="src">
+  <class name="Heart Beat Checker Plugin" type="heartbeat_checker_plugin.heartbeat_checker_plugin.HeartBeatPlugin" base_class_type="rqt_gui_py::Plugin">
+    <description>
+      An example Python GUI plugin to create a great user interface.
+    </description>
+    <qtgui>
+      <group>
+        <label>Custom rqt Plugin</label>
+        <icon type="theme">folder</icon>
+        <statustip>Plugins related to ROS topics</statustip>
+      </group>
+      <label>Heart Beat Checker</label>
+      <icon type="theme">system-help</icon>
+      <statustip>Great user interface to provide real value.</statustip>
+    </qtgui>
+  </class>
+</library>
