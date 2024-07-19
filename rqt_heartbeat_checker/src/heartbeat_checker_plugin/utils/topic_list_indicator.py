@@ -3,9 +3,12 @@ import roslib
 import rosmsg
 from python_qt_binding.QtWidgets import QHBoxLayout, QLabel, QLineEdit, QPushButton, QMenu, QAction
 from python_qt_binding.QtGui import QIcon
+from python_qt_binding.QtCore import qWarning
 
 from rqt_py_common.topic_completer import TopicCompleter
 from rqt_py_common import topic_helpers
+
+from .ros_data import ROSData
 
 class TopicListIndicator(QHBoxLayout):
     def __init__(self, initial_topics=None):
@@ -41,11 +44,10 @@ class TopicListIndicator(QHBoxLayout):
         self.search_box.setCompleter(self._topic_completer)
 
         # user custom qt slot
-        # add topic
+        # about add topic
         self.add_button.clicked.connect(self.add_topic)
         self.search_box.returnPressed.connect(self.add_topic)
-        
-        # remove topic
+        # about remove topic
         self.menu = QMenu(self.del_button)
         self.del_button.clicked.connect(self.show_removable_topics)
 
@@ -53,6 +55,12 @@ class TopicListIndicator(QHBoxLayout):
         topic_name = str(self.search_box.text())
         topic_type, real_topic, _ = topic_helpers.get_topic_type(topic_name)
         print(topic_name, topic_type, real_topic)
+        print(self._rosdata)
+        if topic_name in self._rosdata:
+            qWarning('Topic already subscribed: %s' % topic_name)
+        else:
+            self._rosdata[topic_name] = ROSData(topic_name)
+
 
     def show_removable_topics(self):
         def make_remove_topic_function(x):

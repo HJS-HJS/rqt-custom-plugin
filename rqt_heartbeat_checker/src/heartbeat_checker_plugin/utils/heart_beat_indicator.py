@@ -4,7 +4,7 @@ from std_msgs.msg import Header
 from python_qt_binding.QtWidgets import (
     QLabel,
 )
-from .widget_set import COLOR
+from .qlabel_style import COLOR
 
 class HeartBeatIndicator(QLabel):
     
