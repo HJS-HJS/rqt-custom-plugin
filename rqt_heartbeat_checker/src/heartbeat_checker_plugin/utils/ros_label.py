@@ -15,13 +15,13 @@ class ROSLabel(QLabel):
     Subscriber to ROS topic that buffers incoming data
     """
 
-    def __init__(self, topic_name):
-        super(ROSLabel, self).__init__(topic_name)
+    def __init__(self, topic_name, label_name=None):
+        super(ROSLabel, self).__init__()
         self.topic = topic_name
-        self.title = topic_name
+        self.label = topic_name if label_name is None else label_name
         
         self.setObjectName(self.topic)        
-        self.setText(self.topic)
+        self.setText(self.label)
 
         self.style_red = COLOR["red"]
         self.style_green = COLOR["green"]
@@ -43,10 +43,10 @@ class ROSLabel(QLabel):
             self.sub = None
 
     def close(self):
-        self.sub.unregister()
+        if self.sub is not None: self.sub.unregister()
 
     def __del__(self):
-        self.sub.unregister()
+        if self.sub is not None: self.sub.unregister()
 
     def _ros_cb(self, msg):
         """
@@ -101,10 +101,10 @@ class ROSLabel(QLabel):
         pass
 
     def label_name(self):
-        return self.title
+        return self.label
 
     def set_label_name(self, label_name):
-        self.title = label_name
+        self.label = label_name
 
     def on_timer(self):
         if self.count < self.max_count:

@@ -20,7 +20,7 @@ class HeartBeatPlugin(Plugin):
         print("rqt heartBeat checker plugin closed")
 
     def save_settings(self, plugin_settings, instance_settings):
-        pass
+        instance_settings.set_value('[topics]', self._widget.save_settings())
 
     def restore_settings(self, plugin_settings, instance_settings):
-        pass
+        self._widget.apply_settings(instance_settings.value('[topics]'))

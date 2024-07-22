@@ -58,16 +58,19 @@ class TopicListIndicator(QHBoxLayout):
         self.menu = QMenu(self.del_button)
         self.del_button.setMenu(self.menu)
 
-    def add_topic(self):
+    def add_topic(self, topic_name:str=None, label_name:str=None):
         """generate ros topic qlabel and add to the self._roslabel list
+        Args:
+            topic_name (str, optional): name of topic to add. Defaults to None.
+            label_name (str, optional): name of topic label to apply. Defaults to None.
         """
         # save topic name as text in search_box
-        topic_name = str(self.search_box.text())
+        topic_name = str(self.search_box.text()) if topic_name is None else topic_name
         # check for duplicate topics
         if topic_name in self._roslabel:
             qWarning("Topic already subscribed: %s" % topic_name)
         else:
-            self._roslabel[topic_name] = ROSLabel(topic_name)
+            self._roslabel[topic_name] = ROSLabel(topic_name, label_name)
         # check for changed topic
         self.is_changed = True
 
@@ -125,6 +128,10 @@ class TopicListIndicator(QHBoxLayout):
     @property
     def label_list(self):
         return self._roslabel
+    
+    @property
+    def label_name_list(self):
+        return [self._roslabel[x].label_name() for x in self._roslabel]
 
     @property
     def topic_num(self):
