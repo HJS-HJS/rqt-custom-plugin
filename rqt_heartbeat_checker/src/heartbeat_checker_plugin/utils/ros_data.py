@@ -3,17 +3,31 @@ import threading
 import rospy
 import roslib.message
 import roslib.names
+from python_qt_binding.QtWidgets import (
+    QLabel,
+)
 from rqt_py_common import topic_helpers
+from .qlabel_style import COLOR
 
 
-class ROSData(object):
+class ROSLabel(QLabel):
     """
     Subscriber to ROS topic that buffers incoming data
     """
 
     def __init__(self, topic_name):
+        super(ROSLabel, self).__init__(topic_name)
         self.topic = topic_name
         self.title = topic_name
+        
+        self.setObjectName(self.topic)        
+        self.setText(self.topic)
+
+        self.style_red = COLOR["red"]
+        self.style_green = COLOR["green"]
+
+        self.max_count = 40
+        self.count = 0
 
         self.lock = threading.Lock()
         self.buff_x = []
@@ -29,6 +43,9 @@ class ROSData(object):
             self.sub = None
 
     def close(self):
+        self.sub.unregister()
+
+    def __del__(self):
         self.sub.unregister()
 
     def _ros_cb(self, msg):
@@ -50,6 +67,8 @@ class ROSData(object):
                 self.error = RosPlotException("Invalid topic spec [%s]" % (self.name))
         finally:
             self.lock.release()
+
+        self.count = 0
 
     def next(self):
         """
@@ -86,6 +105,16 @@ class ROSData(object):
 
     def set_label_name(self, label_name):
         self.title = label_name
+
+    def on_timer(self):
+        if self.count < self.max_count:
+            self.setStyleSheet(self.style_green)
+        else:
+            self.setStyleSheet(self.style_red)
+        self.count += 1
+
+        if self.count % 30 == 0:
+            rospy.logwarn(f"{self.text()} is not responding for {self.count} ms.")
 
 
 class RosPlotException(Exception):

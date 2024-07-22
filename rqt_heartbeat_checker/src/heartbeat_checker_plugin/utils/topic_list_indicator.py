@@ -15,7 +15,7 @@ from python_qt_binding.QtCore import qWarning
 from rqt_py_common.topic_completer import TopicCompleter
 from rqt_py_common import topic_helpers
 
-from .ros_data import ROSData
+from .ros_data import ROSLabel
 
 
 class TopicListIndicator(QHBoxLayout):
@@ -25,6 +25,7 @@ class TopicListIndicator(QHBoxLayout):
 
         # topic list
         self._rosdata = {}
+        self.is_changed = False
 
         # create widgets
         self.text = QLabel("Topic")
@@ -65,8 +66,8 @@ class TopicListIndicator(QHBoxLayout):
         if topic_name in self._rosdata:
             qWarning("Topic already subscribed: %s" % topic_name)
         else:
-            self._rosdata[topic_name] = ROSData(topic_name)
-        self.update_removable_topics()
+            self._rosdata[topic_name] = ROSLabel(topic_name)
+        self.is_changed = True
 
     def update_removable_topics(self):
         def make_remove_topic_function(x):
@@ -91,12 +92,14 @@ class TopicListIndicator(QHBoxLayout):
             self.menu.addAction(action)
 
         self.del_button.setMenu(self.menu)
+        self.is_changed = False
         pass
 
     def remove_topic(self, topic_name):
         for topic in topic_name:
+            self._rosdata[topic].setParent(None)
             del self._rosdata[topic]
-        self.update_removable_topics()
+        self.is_changed = True
         pass
 
     def topic_list(self):
