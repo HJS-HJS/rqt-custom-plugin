@@ -38,16 +38,16 @@ class HeartBeatWidget(QWidget):
 
         if self.topic_indicator.is_changed:
             self.topic_indicator.update_removable_topics()
-            for topic_name in self.topic_indicator.topic_list():
-                print(self.topic_indicator.topic_list()[topic_name])
-                self.heart_beat_group_layout.addWidget(self.topic_indicator.topic_list()[topic_name])
+            for topic_name in self.topic_indicator.label_list:
+                print(self.topic_indicator.label_list[topic_name])
+                self.heart_beat_group_layout.addWidget(self.topic_indicator.label_list[topic_name])
 
     def timerEvent(self, event):
         self.update_ui()
-        for topic_name in self.topic_indicator.topic_list():
-            self.topic_indicator.topic_list()[topic_name].on_timer()
+        for topic_name in self.topic_indicator.label_list:
+            self.topic_indicator.label_list[topic_name].on_timer()
 
     def shutdown_plugin(self):
-        for topic_name in self.topic_indicator.topic_list():
-            del self.topic_indicator.topic_list()[topic_name]
+        for topic_name in self.topic_indicator.topic_list:
+            del self.topic_indicator.label_list[topic_name]
         self.timer.stop()
