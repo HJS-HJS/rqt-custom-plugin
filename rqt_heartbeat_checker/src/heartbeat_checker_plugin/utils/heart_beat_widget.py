@@ -18,7 +18,7 @@ class HeartBeatWidget(QWidget):
 
     def init_ui(self):
         # create a vertical layout
-        self.topic_list = TopicListIndicator("")
+        self.topic_indicator = TopicListIndicator("")
 
         # labels to show the status of each node
         self.heat_beat_group = QGroupBox("Heart Beat")
@@ -27,7 +27,7 @@ class HeartBeatWidget(QWidget):
         self.heat_beat_group.setLayout(self.heart_beat_group_layout)
 
         self.vbox = QVBoxLayout()
-        self.vbox.addLayout(self.topic_list)
+        self.vbox.addLayout(self.topic_indicator)
         self.vbox.addWidget(self.heat_beat_group)
         self.setLayout(self.vbox)
 
@@ -36,18 +36,18 @@ class HeartBeatWidget(QWidget):
 
     def update_ui(self):
 
-        if self.topic_list.is_changed:
-            self.topic_list.update_removable_topics()
-            for topic_name in self.topic_list.topic_list():
-                print(self.topic_list.topic_list()[topic_name])
-                self.heart_beat_group_layout.addWidget(self.topic_list.topic_list()[topic_name])
+        if self.topic_indicator.is_changed:
+            self.topic_indicator.update_removable_topics()
+            for topic_name in self.topic_indicator.topic_list():
+                print(self.topic_indicator.topic_list()[topic_name])
+                self.heart_beat_group_layout.addWidget(self.topic_indicator.topic_list()[topic_name])
 
     def timerEvent(self, event):
         self.update_ui()
-        for topic_name in self.topic_list.topic_list():
-            self.topic_list.topic_list()[topic_name].on_timer()
+        for topic_name in self.topic_indicator.topic_list():
+            self.topic_indicator.topic_list()[topic_name].on_timer()
 
     def shutdown_plugin(self):
-        for topic_name in self.topic_list.topic_list():
-            del self.topic_list.topic_list()[topic_name]
+        for topic_name in self.topic_indicator.topic_list():
+            del self.topic_indicator.topic_list()[topic_name]
         self.timer.stop()
