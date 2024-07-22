@@ -54,5 +54,6 @@ class HeartBeatWidget(QWidget):
         return self.topic_indicator.topic_list, self.topic_indicator.label_name_list
     
     def apply_settings(self, saved_topics):
-        for i in range(len(saved_topics[0])):
-            self.topic_indicator.add_topic(saved_topics[0][i], saved_topics[1][i])
+        if saved_topics is not None:
+            for i in range(len(saved_topics[0])):
+                self.topic_indicator.add_topic(saved_topics[0][i], saved_topics[1][i])
