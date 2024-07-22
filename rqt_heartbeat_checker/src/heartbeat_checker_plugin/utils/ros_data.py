@@ -1,34 +1,32 @@
-import string
-import sys
 import threading
-import time
 
-import rosgraph
+import rospy
 import roslib.message
 import roslib.names
-import rospy
+from rqt_py_common import topic_helpers
+
 
 class ROSData(object):
     """
     Subscriber to ROS topic that buffers incoming data
     """
 
-    def __init__(self, topic, start_time):
-        self.name = topic
-        self.start_time = start_time
-        self.error = None
+    def __init__(self, topic_name):
+        self.topic = topic_name
+        self.title = topic_name
 
         self.lock = threading.Lock()
         self.buff_x = []
         self.buff_y = []
+        self.start_time = rospy.get_time()
 
-        topic_type, real_topic, fields = get_topic_type(topic)
+        topic_type, _, _ = topic_helpers.get_topic_type(self.topic)
+
         if topic_type is not None:
-            self.field_evals = generate_field_evals(fields)
             data_class = roslib.message.get_message_class(topic_type)
-            self.sub = rospy.Subscriber(real_topic, data_class, self._ros_cb)
+            self.sub = rospy.Subscriber(self.topic, data_class, self._ros_cb)
         else:
-            self.error = RosPlotException("Can not resolve topic type of %s" % topic)
+            self.sub = None
 
     def close(self):
         self.sub.unregister()
@@ -47,9 +45,9 @@ class ROSData(object):
                     self.buff_x.append(msg.header.stamp.to_sec() - self.start_time)
                 else:
                     self.buff_x.append(rospy.get_time() - self.start_time)
-                #self.axes[index].plot(datax, buff_y)
-            except AttributeError, e:
-                self.error = RosPlotException("Invalid topic spec [%s]: %s" % (self.name, str(e)))
+                # self.axes[index].plot(datax, buff_y)
+            except AttributeError:
+                self.error = RosPlotException("Invalid topic spec [%s]" % (self.name))
         finally:
             self.lock.release()
 
@@ -71,15 +69,24 @@ class ROSData(object):
             self.lock.release()
         return buff_x, buff_y
 
+    def update_topic(self):
+        if self.sub is None:
+            topic_type, _, _ = topic_helpers.get_topic_type(self.topic)
+            if topic_type is not None:
+                data_class = roslib.message.get_message_class(topic_type)
+                self.sub = rospy.Subscriber(self.topic, data_class, self._ros_cb)
+            else:
+                self.sub = None
+
     def _get_data(self, msg):
-        val = msg
-        try:
-            if not self.field_evals:
-                return float(val)
-            for f in self.field_evals:
-                val = f(val)
-            return float(val)
-        except IndexError:
-            self.error = RosPlotException("[%s] index error for: %s" % (self.name, str(val).replace('\n', ', ')))
-        except TypeError:
-            self.error = RosPlotException("[%s] value was not numeric: %s" % (self.name, val))
+        pass
+
+    def label_name(self):
+        return self.title
+
+    def set_label_name(self, label_name):
+        self.title = label_name
+
+
+class RosPlotException(Exception):
+    pass
