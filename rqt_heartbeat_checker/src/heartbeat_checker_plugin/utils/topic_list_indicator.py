@@ -59,7 +59,6 @@ class TopicListIndicator(QHBoxLayout):
         # about remove topic
         self.menu = QMenu(self.del_button)
         self.del_button.setMenu(self.menu)
-        self.del_button.clicked.connect(self.update_removable_topics)
 
     def add_topic(self):
         topic_name = str(self.search_box.text())
