@@ -15,7 +15,7 @@ from python_qt_binding.QtCore import qWarning
 from rqt_py_common.topic_completer import TopicCompleter
 from rqt_py_common import topic_helpers
 
-from .ros_data import ROSLabel
+from .ros_label import ROSLabel
 
 
 class TopicListIndicator(QHBoxLayout):
@@ -24,7 +24,7 @@ class TopicListIndicator(QHBoxLayout):
         self.setObjectName("TopicListIndicator")
 
         # topic list
-        self._rosdata = {}
+        self._roslabel = {}
         self.is_changed = False
 
         # create widgets
@@ -63,10 +63,10 @@ class TopicListIndicator(QHBoxLayout):
 
     def add_topic(self):
         topic_name = str(self.search_box.text())
-        if topic_name in self._rosdata:
+        if topic_name in self._roslabel:
             qWarning("Topic already subscribed: %s" % topic_name)
         else:
-            self._rosdata[topic_name] = ROSLabel(topic_name)
+            self._roslabel[topic_name] = ROSLabel(topic_name)
         self.is_changed = True
 
     def update_removable_topics(self):
@@ -75,15 +75,15 @@ class TopicListIndicator(QHBoxLayout):
 
         self.menu.clear()
 
-        for topic in sorted(self._rosdata.keys()):
+        for topic in sorted(self._roslabel.keys()):
             action = QAction(topic, self.menu)
             action.triggered.connect(make_remove_topic_function([topic]))
             self.menu.addAction(action)
 
-        if len(self._rosdata) > 0:
+        if len(self._roslabel) > 0:
             action = QAction("All", self.menu)
             action.triggered.connect(
-                make_remove_topic_function(sorted(self._rosdata.keys()))
+                make_remove_topic_function(sorted(self._roslabel.keys()))
             )
             self.menu.addAction(action)
         else:
@@ -97,19 +97,19 @@ class TopicListIndicator(QHBoxLayout):
 
     def remove_topic(self, topic_name):
         for topic in topic_name:
-            self._rosdata[topic].setParent(None)
-            del self._rosdata[topic]
+            self._roslabel[topic].setParent(None)
+            del self._roslabel[topic]
         self.is_changed = True
         pass
 
     def topic_list(self):
-        return self._rosdata
+        return self._roslabel
 
     def topic_num(self):
-        return len(self._rosdata.keys())
+        return len(self._roslabel.keys())
 
     def topic_name_list(self):
-        return sorted(self._rosdata.keys())
+        return sorted(self._roslabel.keys())
 
     def __del__(self):
         pass
