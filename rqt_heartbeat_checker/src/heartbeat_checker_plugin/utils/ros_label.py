@@ -89,8 +89,8 @@ class ROSLabel(QLabel):
             self.setStyleSheet(self.style_red)
         self.count += 1
 
-        if self.count % 30 == 0:
-            rospy.logwarn(f"{self.text()} is not responding for {self.count} ms.")
+        if self.count % 50 == 0:
+            rospy.logwarn(f"{self.text()} is not responding for {int(self.count / 10)} s.")
 
     def label_set_menu(self, event):
         dialog = ROSDialog(self.text(), self.topic, self.hz)
