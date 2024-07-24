@@ -114,7 +114,7 @@ class TopicListIndicator(QHBoxLayout):
 
         # connect topic names and remove actions in menu
         for topic in sorted(self._roslabel.keys()):
-            action = QAction(topic, self.menu)
+            action = QAction(self._roslabel[topic].label_name, self.menu)
             action.triggered.connect(make_remove_topic_function([topic]))
             self.menu.addAction(action)
 
