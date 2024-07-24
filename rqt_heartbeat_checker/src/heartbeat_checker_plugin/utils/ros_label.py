@@ -8,7 +8,7 @@ from python_qt_binding.QtWidgets import (
 )
 from rqt_py_common import topic_helpers
 from .qlabel_style import COLOR
-from .qinputdialog import ROSDialog
+from .ros_dialog import ROSDialog
 
 
 class ROSLabel(QLabel):
@@ -16,19 +16,21 @@ class ROSLabel(QLabel):
     Subscriber to ROS topic that buffers incoming data
     """
 
-    def __init__(self, topic_name, label_name=None):
+    def __init__(self, topic_name, label_name=None, hz:float=1.0):
         super(ROSLabel, self).__init__()
         self.topic = topic_name
-        
+        self.hz = hz
+
         self.setObjectName(self.topic)        
         self.setText(topic_name if label_name == None else label_name)
 
         self.style_red = COLOR["red"]
         self.style_green = COLOR["green"]
-        self.max_count = 40
+        self.max_count = int(10 / self.hz)
         self.count = 0
 
         self.contextMenuEvent = self.label_set_menu
+        self.mouseDoubleClickEvent = self.label_set_menu
 
         self.lock = threading.Lock()
         self.buff_x = []
@@ -42,9 +44,6 @@ class ROSLabel(QLabel):
             self.sub = rospy.Subscriber(self.topic, data_class, self._ros_cb)
         else:
             self.sub = None
-
-    def close(self):
-        if self.sub is not None: self.sub.unregister()
 
     def __del__(self):
         if self.sub is not None: self.sub.unregister()
@@ -71,24 +70,6 @@ class ROSLabel(QLabel):
 
         self.count = 0
 
-    def next(self):
-        """
-        Get the next data in the series
-
-        :returns: [xdata], [ydata]
-        """
-        if self.error:
-            raise self.error
-        try:
-            self.lock.acquire()
-            buff_x = self.buff_x
-            buff_y = self.buff_y
-            self.buff_x = []
-            self.buff_y = []
-        finally:
-            self.lock.release()
-        return buff_x, buff_y
-
     def update_topic(self):
         if self.sub is None:
             topic_type, _, _ = topic_helpers.get_topic_type(self.topic)
@@ -101,9 +82,6 @@ class ROSLabel(QLabel):
     def _get_data(self, msg):
         pass
 
-    def label_name(self):
-        return self.text()
-
     def on_timer(self):
         if self.count < self.max_count:
             self.setStyleSheet(self.style_green)
@@ -115,9 +93,15 @@ class ROSLabel(QLabel):
             rospy.logwarn(f"{self.text()} is not responding for {self.count} ms.")
 
     def label_set_menu(self, event):
-        dialog = ROSDialog(self.text(), self.topic)
+        dialog = ROSDialog(self.text(), self.topic, self.hz)
         if dialog.exec():
             self.setText(dialog.getInputs()[0])
+            self.hz = float(dialog.getInputs()[1])
+            self.max_count = int(10 / self.hz)
+
+    @property
+    def label_name(self):
+        return self.text()
 
 class RosPlotException(Exception):
     pass

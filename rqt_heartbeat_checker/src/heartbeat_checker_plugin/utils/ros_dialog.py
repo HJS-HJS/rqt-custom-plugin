@@ -25,7 +25,7 @@ class ROSDialog(QDialog):
         # set input and label
         self.inputs = []
         self.inputs.append(self.line_label)
-        layout.addRow("label", self.inputs[-1])
+        layout.addRow("label ", self.inputs[-1])
         self.inputs.append(self.line_hz)
         layout.addRow("hz", self.inputs[-1])
 
@@ -40,8 +40,10 @@ class ROSDialog(QDialog):
         # insert original label name
         self.line_label.setText(label)
         # insert original hz
-        self.line_hz.setValidator(QDoubleValidator(self))
         self.line_hz.setText(str(hz))
 
     def getInputs(self):
         return tuple(input.text() for input in self.inputs)
+    
+    def __del__(self):
+        pass

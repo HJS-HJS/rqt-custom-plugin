@@ -25,44 +25,52 @@ class TopicListIndicator(QHBoxLayout):
         self.is_changed = False
 
         # create widgets
-        self.text = QLabel("Topic")
-        self.search_box = QLineEdit("")
-        self.add_button = QPushButton()
-        self.del_button = QPushButton()
+        self.text = QLabel("Topic")     # text widget
+        self.search_box = QLineEdit("") # topic search box
+        self.rel_button = QPushButton() # reload topic button
+        self.add_button = QPushButton() # add topic as label button
+        self.del_button = QPushButton() # delete label button
 
         # add widgets to layout
         self.addWidget(self.text)
         self.addWidget(self.search_box)
+        self.addWidget(self.rel_button)
         self.addWidget(self.add_button)
         self.addWidget(self.del_button)
 
         # button widget setting 
-        self.add_button.setIcon(QIcon.fromTheme("add"))
+        self.rel_button.setFixedSize(40, 40)
         self.add_button.setFixedSize(40, 40)
-        self.del_button.setIcon(QIcon.fromTheme("remove"))
         self.del_button.setFixedSize(40, 40)
+        self.rel_button.setIcon(QIcon.fromTheme("reload"))
+        self.add_button.setIcon(QIcon.fromTheme("add"))
+        self.del_button.setIcon(QIcon.fromTheme("remove"))
+        self.rel_button.setEnabled(True)
         self.add_button.setEnabled(True)
         self.del_button.setEnabled(True)
 
         # topic search widget setting
         self._topic_completer = TopicCompleter(self.search_box)
+        # update topic list menu
         self._topic_completer.update_topics()
         self.search_box.setCompleter(self._topic_completer)
 
         # user custom qt slot
-        # when add button clicked, add topic
-        self.add_button.clicked.connect(self.add_topic)
-        # when press enter, add topic
-        self.search_box.returnPressed.connect(self.add_topic)
-        # when del button clicked, show removable topic list
-        self.menu = QMenu(self.del_button)
-        self.del_button.setMenu(self.menu)
+        # reset topics
+        self.rel_button.clicked.connect(self.reload_topic)      # when reload button clicked
+        # add topic
+        self.add_button.clicked.connect(self.add_topic)         # when add button clicked
+        self.search_box.returnPressed.connect(self.add_topic)   # when press enter at search box
+        # show removable topic list
+        self.menu = QMenu(self.del_button)                      # set removable topic menu to del button
+        self.del_button.setMenu(self.menu)                      # when del button clicked
 
-    def add_topic(self, topic_name:str=None, label_name:str=None):
+    def add_topic(self, topic_name:str=None, label_name:str=None, hz:float=1.0):
         """generate ros topic qlabel and add to the self._roslabel list
         Args:
             topic_name (str, optional): name of topic to add. Defaults to None.
             label_name (str, optional): name of topic label to apply. Defaults to None.
+            hz (float, optional): hz of topic to add.
         """
         # save topic name as text in search_box
         topic_name = str(self.search_box.text()) if topic_name is None else topic_name
@@ -70,7 +78,7 @@ class TopicListIndicator(QHBoxLayout):
         if topic_name in self._roslabel:
             qWarning("Topic already subscribed: %s" % topic_name)
         else:
-            self._roslabel[topic_name] = ROSLabel(topic_name, label_name)
+            self._roslabel[topic_name] = ROSLabel(topic_name, label_name, hz)
         # check for changed topic
         self.is_changed = True
 
@@ -87,6 +95,13 @@ class TopicListIndicator(QHBoxLayout):
             del self._roslabel[topic_name]
         # check for changed topic
         self.is_changed = True
+
+    def reload_topic(self):
+        # update topic list menu
+        self._topic_completer.update_topics()
+        # update remove button menu
+        self.update_removable_topics()
+
 
     def update_removable_topics(self):
         """ update deletable topics from del_button menu
@@ -116,8 +131,10 @@ class TopicListIndicator(QHBoxLayout):
             action.setEnabled(False)
             self.menu.addAction(action)
 
-        # set updated menu
+        # update del button menu
         self.del_button.setMenu(self.menu)
+        # update topic list menu
+        self._topic_completer.update_topics()
         # check for changed topic
         self.is_changed = False
 
@@ -131,8 +148,12 @@ class TopicListIndicator(QHBoxLayout):
     
     @property
     def label_name_list(self):
-        return [self._roslabel[x].label_name() for x in self._roslabel]
+        return [self._roslabel[x].label_name for x in self._roslabel]
 
+    @property
+    def topic_hz_list(self):
+        return [self._roslabel[x].hz for x in self._roslabel]
+    
     @property
     def topic_num(self):
         return len(self._roslabel.keys())
