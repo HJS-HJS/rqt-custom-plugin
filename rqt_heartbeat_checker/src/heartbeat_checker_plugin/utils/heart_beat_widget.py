@@ -20,13 +20,13 @@ class HeartBeatWidget(QWidget):
         # create a vertical layout
         self.topic_indicator = TopicListIndicator("")
 
-        # labels to show the status of each node
-        self.heat_beat_group = QGroupBox("Heart Beat")
-        self.heart_beat_group_layout = QVBoxLayout()
+        # create widgets and labels
+        self.vbox = QVBoxLayout()
+        self.heat_beat_group = QGroupBox("Heart Beat")      #
+        self.heart_beat_group_layout = QVBoxLayout()        # labels to show the status of each node
 
         self.heat_beat_group.setLayout(self.heart_beat_group_layout)
 
-        self.vbox = QVBoxLayout()
         self.vbox.addLayout(self.topic_indicator)
         self.vbox.addWidget(self.heat_beat_group)
         self.setLayout(self.vbox)
@@ -51,9 +51,9 @@ class HeartBeatWidget(QWidget):
         self.timer.stop()
 
     def save_settings(self):
-        return self.topic_indicator.topic_list, self.topic_indicator.label_name_list
+        return self.topic_indicator.topic_list, self.topic_indicator.label_name_list, self.topic_indicator.topic_hz_list
     
     def apply_settings(self, saved_topics):
         if saved_topics is not None:
             for i in range(len(saved_topics[0])):
-                self.topic_indicator.add_topic(saved_topics[0][i], saved_topics[1][i])
+                self.topic_indicator.add_topic(saved_topics[0][i], saved_topics[1][i], saved_topics[2][i])
