@@ -8,6 +8,7 @@ from python_qt_binding.QtWidgets import (
 )
 from rqt_py_common import topic_helpers
 from .qlabel_style import COLOR
+from .qinputdialog import ROSDialog
 
 
 class ROSLabel(QLabel):
@@ -18,16 +19,16 @@ class ROSLabel(QLabel):
     def __init__(self, topic_name, label_name=None):
         super(ROSLabel, self).__init__()
         self.topic = topic_name
-        self.label = topic_name if label_name is None else label_name
         
         self.setObjectName(self.topic)        
-        self.setText(self.label)
+        self.setText(topic_name if label_name == None else label_name)
 
         self.style_red = COLOR["red"]
         self.style_green = COLOR["green"]
-
         self.max_count = 40
         self.count = 0
+
+        self.contextMenuEvent = self.label_set_menu
 
         self.lock = threading.Lock()
         self.buff_x = []
@@ -101,10 +102,7 @@ class ROSLabel(QLabel):
         pass
 
     def label_name(self):
-        return self.label
-
-    def set_label_name(self, label_name):
-        self.label = label_name
+        return self.text()
 
     def on_timer(self):
         if self.count < self.max_count:
@@ -116,6 +114,10 @@ class ROSLabel(QLabel):
         if self.count % 30 == 0:
             rospy.logwarn(f"{self.text()} is not responding for {self.count} ms.")
 
+    def label_set_menu(self, event):
+        dialog = ROSDialog(self.text(), self.topic)
+        if dialog.exec():
+            self.setText(dialog.getInputs()[0])
 
 class RosPlotException(Exception):
     pass
