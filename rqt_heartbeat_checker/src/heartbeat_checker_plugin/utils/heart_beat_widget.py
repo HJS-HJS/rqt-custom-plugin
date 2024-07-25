@@ -23,9 +23,9 @@ class HeartBeatWidget(QWidget):
         """Generate GUI include each topic label.
         """
         # Create widgets and labels.
-        self.vbox = QVBoxLayout()                       # Layout that contain every widget, label created in this funtion.
-        self.topic_indicator = TopicListIndicator("")   # Layout to search, add, remove topics.
-        self.heart_beat_group_layout = QVBoxLayout()    # Layout to show the status of every topic node.
+        self.vbox = QVBoxLayout()                     # Layout that contain every widget, label created in this funtion.
+        self.topic_indicator = TopicListIndicator()   # Layout to search, add, remove topics.
+        self.heart_beat_group_layout = QVBoxLayout()  # Layout to show the status of every topic node.
 
         # Set the relationship between each layout.
         self.vbox.addLayout(self.topic_indicator)
