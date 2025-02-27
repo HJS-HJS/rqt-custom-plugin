@@ -1,5 +1,5 @@
-# rqt_custom_plugin
-- rqt_custom_plugin is a collection of custom RQT plugins for the Robot Operating System (ROS).
+# rqt-custom-plugin
+- rqt custom plugin is a collection of custom RQT plugins for the Robot Operating System (ROS).
 - Currently, it includes the rqt_heartbeat_checker plugin, which monitors heartbeat signals from a specific topic to check system status. 
 - More plugins will be added in the future.
 
